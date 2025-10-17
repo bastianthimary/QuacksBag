@@ -1,0 +1,79 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace "com.example.quacksbag"
+    compileSdkVersion 33
+
+    defaultConfig {
+        applicationId "com.example.quacksbag"
+        minSdkVersion 24
+        targetSdkVersion 33
+        versionCode 1
+        versionName "1.0"
+
+        // Damit JUnit 5 auch auf dem Instrumented-Test-Layer laufen kann (optional)
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // Aktiviert den JUnit 5 Test-Runner für Unit-Tests
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.annotation:annotation:1.6.0'
+    implementation 'org.projectlombok:lombok:0.11.0'
+    implementation 'androidx.annotation:annotation-jvm:1.9.1'
+
+    // ✅ JUnit 5
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+
+    // Optional: Assertions & Parameterized Tests
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.0'
+
+    // Android spezifisch (falls du UI Tests brauchst)
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    testImplementation 'org.mockito:mockito-core:5.7.0'
+}
+
+/*configurations {
+    all {
+        exclude group: "androidx.annotation", module: "annotation-jvm"
+    }
+}*/
+
+afterEvaluate {
+    tasks.register('runSimulation', JavaExec) {
+        group = "Execution"
+        description = "Runs the RunSimulation main method"
+        // Verwendet den Runtime-Classpath der 'debug'-Variante.
+        // Dieser beinhaltet die kompilierten 'main'-Sourcen und alle Abhängigkeiten für den Debug-Build.
+        classpath = project.configurations.getByName("debugRuntimeClasspath")
+        mainClass = 'com.example.quacksbag.ai.RunSimulation'
+
+        // Falls deine main-Methode Kommandozeilenargumente benötigt, kannst du sie hier hinzufügen:
+        // args 'argument1', 'argument2'
+        // Standard-Java-Systemeigenschaften können auch gesetzt werden:
+        // systemProperty 'meine.eigenschaft', 'wert'
+    }
+}

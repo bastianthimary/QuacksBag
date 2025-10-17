@@ -1,0 +1,56 @@
+package com.example.quacksbag.baserules;
+
+import com.example.quacksbag.gamematerial.Chip;
+import com.example.quacksbag.logging.Logger;
+import com.example.quacksbag.player.DecisionMaker;
+import com.example.quacksbag.player.DrawChoice;
+import com.example.quacksbag.ruleset.Ruleset;
+
+public class GameManager {
+
+    private final Ruleset ruleset;
+    private final PlayerScore playerScore;
+    private final DecisionMaker decisionMaker;
+    private RoundClaudron roundClaudron;
+    private int currentRound;
+
+    public GameManager(Ruleset ruleset, String name, DecisionMaker decisionMaker) {
+        playerScore = new PlayerScore(name);
+        this.ruleset = ruleset;
+        this.decisionMaker = decisionMaker;
+        decisionMaker.setGameManager(this);
+    }
+
+    public int playGame() {
+        for (currentRound = 1; currentRound < 10; currentRound++) {
+            Logger.info("Round: " + currentRound);
+            BagManager bagManager = playerScore.getBagManager();
+            roundClaudron = new RoundClaudron(playerScore.getClaudronPlayersData(), ruleset, new RoundBagManager(bagManager.getPurchasedChips()), decisionMaker);
+            DrawChoice drawChoice = DrawChoice.DRAW_NEXT;
+            while (!roundClaudron.isExploded() && drawChoice == DrawChoice.DRAW_NEXT) {
+                Chip chip = BagDrawer.drawRandomChipAndUpdateBag(roundClaudron.getRoundBagManager());
+                roundClaudron.putChipInClaudron(chip);
+                drawChoice = decisionMaker.doAnotherDraw();
+            }
+            Logger.info("Go to Finish Round: " + currentRound);
+            RoundFinishManager roundFinishManager = new RoundFinishManager(roundClaudron, ruleset, playerScore, decisionMaker, currentRound);
+            Logger.debug("Init RoundFinishManager finished");
+            roundFinishManager.excecuteRoundFinish();
+        }
+        var victoryPoints=playerScore.getVictoryPoints();
+        Logger.result("Game finished with " + victoryPoints + " victory points");
+        return victoryPoints;
+    }
+
+    public int getCurrentRound() {
+        return currentRound;
+    }
+
+    public PlayerScore getPlayerScore() {
+        return playerScore;
+    }
+
+    public RoundClaudron getRoundClaudron() {
+        return roundClaudron;
+    }
+}
