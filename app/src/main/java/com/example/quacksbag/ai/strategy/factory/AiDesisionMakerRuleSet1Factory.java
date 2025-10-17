@@ -4,7 +4,6 @@ import com.example.quacksbag.ai.AiDecisionMakerRuleSet1;
 import com.example.quacksbag.ai.strategy.draw.DrawStrategy;
 import com.example.quacksbag.ai.strategy.explosion.ExplosionStrategy;
 import com.example.quacksbag.ai.strategy.factory.draw.DrawStrategyFactory;
-import com.example.quacksbag.ai.strategy.factory.draw.DrawStrategyOption;
 import com.example.quacksbag.ai.strategy.factory.draw.DrawStrategyOptionWrapper;
 import com.example.quacksbag.ai.strategy.factory.explosion.ExplosionStrategyFactory;
 import com.example.quacksbag.ai.strategy.factory.explosion.ExplosionStrategyOptionWrapper;

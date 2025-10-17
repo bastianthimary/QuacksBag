@@ -1,6 +1,5 @@
 package com.example.quacksbag.max.strategy.buy;
 
-import com.example.quacksbag.gamematerial.ChipColor;
 import com.example.quacksbag.ruleset.ChipPrice;
 
 import java.util.ArrayList;

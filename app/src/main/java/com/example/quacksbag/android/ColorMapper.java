@@ -31,6 +31,7 @@ public class ColorMapper {
                 break;
             case YELLOW:
                 hexvalue = Color.YELLOW;
+                break;
             default:
         }
         return hexvalue;

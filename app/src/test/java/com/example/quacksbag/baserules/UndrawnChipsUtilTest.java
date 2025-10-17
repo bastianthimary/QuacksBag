@@ -1,6 +1,10 @@
 package com.example.quacksbag.baserules;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.quacksbag.gamematerial.Chip;
 import com.example.quacksbag.gamematerial.ChipColor;
@@ -13,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class UndrawnChipsUtilTest {
+class UndrawnChipsUtilTest {
 
     private List<Chip> testChips;
 
@@ -91,7 +95,7 @@ public class UndrawnChipsUtilTest {
 
     @Test
     void testFindChipsByColor_NonExistingColor() {
-        List<Chip> whiteOnly = Arrays.asList(new Chip(ChipColor.WHITE, 1));
+        List<Chip> whiteOnly = List.of(new Chip(ChipColor.WHITE, 1));
         List<Chip> result = UndrawnChipsUtil.findChipsByColor(whiteOnly, ChipColor.BLUE);
         assertEquals(0, result.size());
     }
@@ -115,8 +119,6 @@ public class UndrawnChipsUtilTest {
         List<Chip> result = UndrawnChipsUtil.findChipsByColor(new ArrayList<>(), ChipColor.RED);
         assertEquals(0, result.size());
     }
-
-
 
 
     // ========== Tests for countChipsByColor ==========
@@ -208,14 +210,12 @@ public class UndrawnChipsUtilTest {
 
     @Test
     void testContainsChipOfColor_NullColor() {
-        boolean result = UndrawnChipsUtil.containsChipOfColor(testChips, null);
-        assertFalse(result);
+        assertFalse(UndrawnChipsUtil.containsChipOfColor(testChips, null));
     }
 
     @Test
     void testContainsChipOfColor_NullList() {
-        boolean result = UndrawnChipsUtil.containsChipOfColor(null, ChipColor.RED);
-        assertFalse(result);
+        assertFalse(UndrawnChipsUtil.containsChipOfColor(null, ChipColor.RED));
     }
 
     @Test

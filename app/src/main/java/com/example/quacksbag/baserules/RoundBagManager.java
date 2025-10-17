@@ -60,8 +60,7 @@ public class RoundBagManager {
     }
 
     public Chip drawChipFromBag(int chipId) {
-        Chip drawnChip = undrawnChipsInBag.remove(chipId);
-        return drawnChip;
+        return undrawnChipsInBag.remove(chipId);
     }
     public void putChipInClaudron(Chip chip){
         drawnChips.add(chip);

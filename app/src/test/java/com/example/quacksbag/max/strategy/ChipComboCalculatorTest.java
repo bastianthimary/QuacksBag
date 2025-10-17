@@ -15,8 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
-public class ChipComboCalculatorTest {
+class ChipComboCalculatorTest {
 
     // Helper method to create ChipPrice for tests
     private ChipPrice createChipPrice(int value, ChipColor color, int price) {
@@ -25,7 +24,7 @@ public class ChipComboCalculatorTest {
     }
 
     @Test
-    public void testCalculateAllCombos_ForBudget_emptyChipList() {
+    void testCalculateAllCombos_ForBudget_emptyChipList() {
         List<ChipPrice> chips = new ArrayList<>();
         int budget = 10;
         List<ComboResult> results = ChipComboCalculator.calculateAllCombosForBudget(chips, budget);
@@ -33,7 +32,7 @@ public class ChipComboCalculatorTest {
     }
 
     @Test
-    public void testCalculateAllCombos_ForBudget_budgetTooSmall() {
+    void testCalculateAllCombos_ForBudget_budgetTooSmall() {
         List<ChipPrice> chips = new ArrayList<>();
         chips.add(createChipPrice(1, ChipColor.BLUE, 5));
         chips.add(createChipPrice(2, ChipColor.RED, 8));
@@ -43,7 +42,7 @@ public class ChipComboCalculatorTest {
         assertTrue( results.isEmpty(),"Results should be empty if budget is too small");
     }
     @Test
-    public void testCalculateAllCombos_ForBudget_validBudget() {
+    void testCalculateAllCombos_ForBudget_validBudget() {
         List<ChipPrice> chips = new ArrayList<>();
         chips.add(createChipPrice(1, ChipColor.BLUE, 5));
         chips.add(createChipPrice(2, ChipColor.RED, 8));
@@ -53,7 +52,7 @@ public class ChipComboCalculatorTest {
         assertEquals( 1,results.size());
     }
     @Test
-    public void testCalculateAllCombos_ForBudget_validHighBudget() {
+    void testCalculateAllCombos_ForBudget_validHighBudget() {
         List<ChipPrice> chips = new ArrayList<>();
         chips.add(createChipPrice(1, ChipColor.BLUE, 5));
         chips.add(createChipPrice(2, ChipColor.RED, 8));
@@ -63,7 +62,7 @@ public class ChipComboCalculatorTest {
         assertEquals( 2,results.size());
     }
     @Test
-    public void testCalculateAllCombos_ForBudget_validHigh2Budget() {
+    void testCalculateAllCombos_ForBudget_validHigh2Budget() {
         List<ChipPrice> chips = new ArrayList<>();
         chips.add(createChipPrice(1, ChipColor.BLUE, 5));
         chips.add(createChipPrice(2, ChipColor.RED, 8));
@@ -73,7 +72,7 @@ public class ChipComboCalculatorTest {
         assertEquals( 4,results.size());
     }
     @Test
-    public void testCalculateAllCombos_ForBudget_validHigh3Budget() {
+    void testCalculateAllCombos_ForBudget_validHigh3Budget() {
         List<ChipPrice> chips = new ArrayList<>();
         chips.add(createChipPrice(1, ChipColor.BLUE, 5));
         chips.add(createChipPrice(2, ChipColor.BLUE, 10));
@@ -87,7 +86,7 @@ public class ChipComboCalculatorTest {
         assertEquals( 22,results.size());
     }
     @Test
-    public void testCalculateAllCombos_ForBudget_validHigh4Budget() {
+    void testCalculateAllCombos_ForBudget_validHigh4Budget() {
         List<ChipPrice> chips = new ArrayList<>();
         ChipPrice chipA = createChipPrice(1, ChipColor.BLUE, 4);
         ChipPrice chipB = createChipPrice(1, ChipColor.ORANGE, 5);
