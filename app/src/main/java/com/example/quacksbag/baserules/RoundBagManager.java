@@ -23,6 +23,7 @@ public class RoundBagManager {
     }
 
     private void initUndrawnChipsInBag(List<Chip> purchasedChips) {
+        // Always add default starting chips for each round
         undrawnChipsInBag.addAll(defaultStartingChips());
         // add purchased chips (copies)
         for (Chip p : purchasedChips) {
@@ -46,23 +47,28 @@ public class RoundBagManager {
     public boolean isBagEmpty() {
         return undrawnChipsInBag.isEmpty();
     }
-    public ArrayList<Chip> getDrawnChips(){
+
+    public ArrayList<Chip> getDrawnChips() {
         return drawnChips;
     }
-    public ArrayList<Chip> getUndrawnChips(){
+
+    public ArrayList<Chip> getUndrawnChips() {
         return undrawnChipsInBag;
     }
+
     public int currentNumberOfUndrawnChips() {
         return undrawnChipsInBag.size();
     }
-    public int currentNumberOfDrawnChips(){
+
+    public int currentNumberOfDrawnChips() {
         return drawnChips.size();
     }
 
     public Chip drawChipFromBag(int chipId) {
         return undrawnChipsInBag.remove(chipId);
     }
-    public void putChipInClaudron(Chip chip){
+
+    public void putChipInClaudron(Chip chip) {
         drawnChips.add(chip);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.quacksbag.util;
+package com.example.quacksbag.statistic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -35,10 +35,7 @@ public class SimulationStatistics {
     public void incrementExplosion(){
         totalExplodes.incrementAndGet();
     }
-    public void incrementDropBonus(){
 
-        totalDropBonus.incrementAndGet();
-    }
     public void printStatistics() {
         synchronized (lock) {
             int runs = totalRuns.get();

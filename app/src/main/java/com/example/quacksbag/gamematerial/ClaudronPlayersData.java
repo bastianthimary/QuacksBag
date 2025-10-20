@@ -1,6 +1,8 @@
 package com.example.quacksbag.gamematerial;
 
-import com.example.quacksbag.util.SimulationStatistics;
+
+import static com.example.quacksbag.statistic.GameStatistic.getGameStatistic;
+import static com.example.quacksbag.statistic.RoundStatistic.getRoundStatistic;
 
 public class ClaudronPlayersData {
     int dropBonus;
@@ -17,7 +19,7 @@ public class ClaudronPlayersData {
 
     public void addDropBonus() {
         this.dropBonus++;
-        SimulationStatistics.getInstance().incrementDropBonus();
+        getGameStatistic().incrementDropBonus();
     }
 
     public boolean isFlaskFilled() {
@@ -26,6 +28,7 @@ public class ClaudronPlayersData {
 
     public boolean useFlask() {
         if (isFlaskFilled()) {
+            getRoundStatistic().useFlask();
             flaskFilled = false;
             return true;
         }

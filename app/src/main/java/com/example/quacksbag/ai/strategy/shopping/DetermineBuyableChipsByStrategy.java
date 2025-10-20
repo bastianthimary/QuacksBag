@@ -20,7 +20,7 @@ public class DetermineBuyableChipsByStrategy {
     }
 
     public List<ChipPrice> filterBuyableChips(GameManager gameManager, List<ChipPrice> buyableChips) {
-        var chipsInBag = gameManager.getPlayerScore().getBagManager().getPurchasedChips();
+        var chipsInBag = new ArrayList<>(gameManager.getPlayerScore().getBagManager().getPurchasedChips());
         chipsInBag.addAll(BagUtil.defaultStartingChips());
         List<ChipColor> stillNeededColors = determineStillNeededColors(chipsInBag);
         return filterBuyableChipsByNeededColors(buyableChips, stillNeededColors);

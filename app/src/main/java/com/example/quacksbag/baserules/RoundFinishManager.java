@@ -1,5 +1,7 @@
 package com.example.quacksbag.baserules;
 
+import static com.example.quacksbag.statistic.GameStatistic.getGameStatistic;
+
 import com.example.quacksbag.gamematerial.Bubble;
 import com.example.quacksbag.gamematerial.Chip;
 import com.example.quacksbag.gamematerial.Claudron;
@@ -82,7 +84,7 @@ public class RoundFinishManager {
         if (rubyCount < 2) {
             return 0;
         }
-        return (rubyCount - 2) / 2 + 1;
+        return (rubyCount - 1) / 2 + 1;
     }
 
     private boolean isRubyField() {
@@ -108,7 +110,10 @@ public class RoundFinishManager {
         Logger.result("Do Shopping Round: " + currentRound + " BubbleValue: " + reachedBubble.getBubbleValue() + "");
         var shoppingList = ShoppingUtil.determineShoppingList(ruleset, currentRound);
         List<Chip> buyedChips = decisionMaker.doShoppingChoice(reachedBubble.getBubbleValue(), shoppingList);
-        buyedChips.forEach(chip -> playerScore.getBagManager().purchaseChipPreset(chip));
+        buyedChips.forEach(chip -> {
+            playerScore.getBagManager().purchaseChipPreset(chip);
+            getGameStatistic().addBuyedChip(chip);
+        });
 
     }
 

@@ -7,10 +7,12 @@ import com.example.quacksbag.ai.strategy.rubybuyables.RubyBuyableStrategy;
 import com.example.quacksbag.ai.strategy.shopping.ShoppingStrategy;
 import com.example.quacksbag.baserules.GameManager;
 import com.example.quacksbag.gamematerial.Chip;
+import com.example.quacksbag.gamematerial.ChipColor;
 import com.example.quacksbag.player.DrawChoice;
 import com.example.quacksbag.player.ExplosionChoice;
 import com.example.quacksbag.player.RubyBuyables;
 import com.example.quacksbag.ruleset.ChipPrice;
+import com.example.quacksbag.ruleset.implementations.ChoosenChip;
 import com.example.quacksbag.ruleset.implementations.Rulset1DecisionMaker;
 
 import java.util.List;
@@ -61,5 +63,24 @@ public class AiDecisionMakerRuleSet1 extends Rulset1DecisionMaker {
     @Override
     public void setGameManager(GameManager gameManager) {
         this.gameManager = gameManager;
+    }
+
+    @Override
+    public ChoosenChip chooseChipForBlueEffect(List<Chip> chips) {
+        ChoosenChip choosenChip = null;
+        for (Chip chip : chips) {
+            if (!ChipColor.WHITE.equals(chip.getColor())) {
+                if (choosenChip == null) {
+                    choosenChip = new ChoosenChip(chip);
+                } else {
+                    if (choosenChip.getChip().getValue() < chip.getValue()) {
+                        choosenChip = new ChoosenChip(chip);
+                    }
+                }
+            }
+        }
+
+
+        return choosenChip;
     }
 }

@@ -1,20 +1,15 @@
 package com.example.quacksbag.gamematerial;
 
 
-
-
-import java.util.UUID;
 import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
 public class Chip {
-    private final String id; // unique id for a chip instance
     private final ChipColor color; // e.g. "White", "Blue"
     private final int value; // numeric value (1,2,3,4...)
 
     public Chip(ChipColor color, int value) {
-        this.id = UUID.randomUUID().toString();
         this.color = color;
         this.value = value;
     }
@@ -36,5 +31,18 @@ public class Chip {
     @Override
     public String toString() {
         return color.getColorname() + " " + value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Chip chip = (Chip) o;
+        return value == chip.value && color == chip.color;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * color.hashCode() + value;
     }
 }

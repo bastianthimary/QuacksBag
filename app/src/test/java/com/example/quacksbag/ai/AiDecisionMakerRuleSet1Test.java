@@ -1,6 +1,9 @@
 package com.example.quacksbag.ai;
 
 
+import static com.example.quacksbag.statistic.GameStatistic.getGameStatistic;
+import static com.example.quacksbag.statistic.RoundStatistic.getRoundStatistic;
+
 import com.example.quacksbag.ai.strategy.factory.AiDesisionMakerRuleSet1Factory;
 import com.example.quacksbag.ai.strategy.factory.draw.DrawStrategyOption;
 import com.example.quacksbag.ai.strategy.factory.draw.DrawStrategyOptionWrapper;
@@ -16,7 +19,9 @@ import com.example.quacksbag.gamematerial.ChipColor;
 import com.example.quacksbag.logging.Logger;
 import com.example.quacksbag.max.strategy.buy.ComboResultWeight;
 import com.example.quacksbag.ruleset.implementations.Ruleset1;
-import com.example.quacksbag.util.SimulationStatistics;
+import com.example.quacksbag.statistic.GameStatistic;
+import com.example.quacksbag.statistic.RoundStatistic;
+import com.example.quacksbag.statistic.SimulationStatistics;
 
 import org.junit.jupiter.api.Test;
 
@@ -50,23 +55,60 @@ import java.util.List;
  * new RubyBuyableStrategyOptionWrapper(RubyBuyableStrategyOption.BUY_DROP_TILL_ROUND, 8)
  */
 class AiDecisionMakerRuleSet1Test {
-   // @Test
+
+    @Test
     public void testSimulation() {
+        Logger.setLevel(Logger.Level.RESULTDEEP);
+        Logger.info("Starting simulation...");
+
+        // Reset statistics before running tests
+        SimulationStatistics.getInstance().reset();
+
+        int numberOfSimulations = 100;
+        Logger.info("Running " + numberOfSimulations + " simulations...");
+
+        // Initialize the decision maker once
+        AiDecisionMakerRuleSet1 decisionMakerRuleSet1 = AiDesisionMakerRuleSet1Factory.createAiDesisionMakerRuleSet1(
+                new DrawStrategyOptionWrapper(DrawStrategyOption.CUSTOM_DRAW_BY_PROBABILITY, 0.5),
+                new ExplosionStrategyOptionWrapper(ExplosionStrategyOption.PURE_SHOPPING),
+                ComboResultWeight.ALLWAYS2CHIPS_MAXSCORE,
+                List.of(new WishedChip(ChipColor.YELLOW)),
+                new FlaskStrategyOptionWrapper(FlaskStrategyOption.USE_FLASK_BY_PROBABILITY, 0.4),
+                new RubyBuyableStrategyOptionWrapper(RubyBuyableStrategyOption.BUY_DROP_TILL_ROUND, 8)
+        );
+
+        // Run simulations
+        for (int i = 0; i < numberOfSimulations; i++) {
+
+            GameManager gameManager = new GameManager(new Ruleset1(), "test_" + i, decisionMakerRuleSet1);
+            var result = gameManager.playGame();
+
+            SimulationStatistics.getInstance().recordResult(result);
+            RoundStatistic.reset();
+            GameStatistic.getGameStatistic().clear();
+        }
+
+        // Print final statistics
+        SimulationStatistics.getInstance().printStatistics();
+    }
+
+    @Test
+    public void testSingleSimulation() {
         Logger.setLevel(Logger.Level.RESULTBASE);
         Logger.info("Starting simulation...");
 
         // Reset statistics before running tests
         SimulationStatistics.getInstance().reset();
 
-        int numberOfSimulations = 100000;
+        int numberOfSimulations = 1;
         Logger.info("Running " + numberOfSimulations + " simulations...");
 
         // Initialize the decision maker once
         AiDecisionMakerRuleSet1 decisionMakerRuleSet1 = AiDesisionMakerRuleSet1Factory.createAiDesisionMakerRuleSet1(
-                new DrawStrategyOptionWrapper(DrawStrategyOption.CUSTOM_DRAW_BY_PROBABILITY,0.5),
+                new DrawStrategyOptionWrapper(DrawStrategyOption.CUSTOM_DRAW_BY_PROBABILITY, 0.25),
                 new ExplosionStrategyOptionWrapper(ExplosionStrategyOption.PURE_SHOPPING),
                 ComboResultWeight.ALLWAYS2CHIPS_MAXSCORE,
-                List.of(new WishedChip(ChipColor.BLACK)),
+                List.of(new WishedChip(ChipColor.YELLOW)),
                 new FlaskStrategyOptionWrapper(FlaskStrategyOption.USE_FLASK_BY_PROBABILITY, 0.4),
                 new RubyBuyableStrategyOptionWrapper(RubyBuyableStrategyOption.BUY_DROP_TILL_ROUND, 8)
         );
@@ -79,8 +121,9 @@ class AiDecisionMakerRuleSet1Test {
 
             SimulationStatistics.getInstance().recordResult(result);
         }
-
+        Logger.resultDeep(getRoundStatistic().toString());
         // Print final statistics
         SimulationStatistics.getInstance().printStatistics();
+        Logger.resultDeep(getGameStatistic().toString());
     }
 }

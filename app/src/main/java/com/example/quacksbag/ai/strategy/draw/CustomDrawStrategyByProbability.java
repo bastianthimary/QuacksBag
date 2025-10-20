@@ -22,13 +22,17 @@ public class CustomDrawStrategyByProbability extends DrawStrategy {
         return DrawChoice.DRAW_NEXT;
     }
 
-    private boolean isTheProbabilityToExplodeHigherThanMyLimit(GameManager gameManager) {
+    protected boolean isTheProbabilityToExplodeHigherThanMyLimit(GameManager gameManager) {
         var roundClaudron = gameManager.getRoundClaudron();
         var fireCrackerCounter = roundClaudron.getFirecrackerPeaCounter();
         var limitForExplosion = 7 - fireCrackerCounter;
-        var numberOfWhiteChipsWhichCanExplode = roundClaudron.getRoundBagManager().getUndrawnChips().stream().filter(chip -> chip.getColor().equals(ChipColor.WHITE) && chip.getValue() >= limitForExplosion).count();
-        var numberofChipsinClaudron = roundClaudron.getRoundBagManager().getDrawnChips().size();
-        double probabilityToExplode=numberOfWhiteChipsWhichCanExplode/numberofChipsinClaudron;
+        var numberOfWhiteChipsWhichCanExplode = roundClaudron.getRoundBagManager()
+                .getUndrawnChips().stream()
+                .filter(chip -> chip.getColor().equals(ChipColor.WHITE) && chip.getValue() >= limitForExplosion)
+                .count();
+
+        var numberofChipsinClaudron = roundClaudron.getRoundBagManager().getUndrawnChips().size();
+        double probabilityToExplode = (double) numberOfWhiteChipsWhichCanExplode / numberofChipsinClaudron;
         return probabilityToExplode> probabilityInZeroDot;
     }
 }

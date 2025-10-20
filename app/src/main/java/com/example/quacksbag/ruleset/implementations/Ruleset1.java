@@ -2,6 +2,7 @@ package com.example.quacksbag.ruleset.implementations;
 
 import static com.example.quacksbag.gamematerial.ChipColor.BLUE;
 import static com.example.quacksbag.gamematerial.ChipColor.YELLOW;
+import static com.example.quacksbag.statistic.RoundStatistic.getRoundStatistic;
 
 import com.example.quacksbag.baserules.BagDrawer;
 import com.example.quacksbag.baserules.PlayerScore;
@@ -10,7 +11,6 @@ import com.example.quacksbag.baserules.RoundClaudron;
 import com.example.quacksbag.baserules.UndrawnChipsUtil;
 import com.example.quacksbag.gamematerial.Chip;
 import com.example.quacksbag.gamematerial.ChipColor;
-import com.example.quacksbag.logging.Logger;
 import com.example.quacksbag.player.DecisionMaker;
 import com.example.quacksbag.ruleset.PriceRuleset;
 import com.example.quacksbag.ruleset.Ruleset;
@@ -30,7 +30,7 @@ public class Ruleset1 implements Ruleset {
         this.roundClaudron = roundClaudron;
         int value = determineValue(chip, roundBagManager);
         roundBagManager.putChipInClaudron(chip);
-        executeInstantEffect(chip, roundBagManager);
+        value += executeInstantEffect(chip, roundBagManager);
 
         return value;
     }
@@ -40,12 +40,16 @@ public class Ruleset1 implements Ruleset {
         long purpleCount = chipsInClaudron.getDrawnChips().stream().filter(chip -> chip.getColor().equals(ChipColor.PURPLE)).count();
         if (purpleCount == 1) {
             playerScore.addVictoryPoints(1);
+            getRoundStatistic().incrementColorTriggered(ChipColor.PURPLE);
+
         } else if (purpleCount == 2) {
             playerScore.addVictoryPoints(1);
             playerScore.addRuby();
+            getRoundStatistic().incrementColorTriggered(ChipColor.PURPLE);
         } else if (purpleCount >= 3) {
             playerScore.addVictoryPoints(2);
             playerScore.addClaudronDropBonus();
+            getRoundStatistic().incrementColorTriggered(ChipColor.PURPLE);
         }
     }
 
@@ -53,11 +57,16 @@ public class Ruleset1 implements Ruleset {
     public void executeGreenRoundEndEffect(RoundBagManager chipsInClaudron, PlayerScore playerScore) {
         var drawnChips = chipsInClaudron.getDrawnChips();
         int numberOfChips = drawnChips.size();
+        if (numberOfChips < 2) {
+            return;
+        }
         if (ChipColor.GREEN.equals(drawnChips.get(numberOfChips - 1).getColor())) {
             playerScore.addRuby();
+            getRoundStatistic().incrementColorTriggered(ChipColor.GREEN);
         }
         if (ChipColor.GREEN.equals(drawnChips.get(numberOfChips - 2).getColor())) {
             playerScore.addRuby();
+            getRoundStatistic().incrementColorTriggered(ChipColor.GREEN);
         }
     }
 
@@ -65,37 +74,48 @@ public class Ruleset1 implements Ruleset {
     public void executeBlackRoundEndEffect(RoundBagManager chipsInClaudron, PlayerScore playerScore) {
         var drawnChips = chipsInClaudron.getDrawnChips();
         if (UndrawnChipsUtil.containsChipOfColor(drawnChips, ChipColor.BLACK)) {
-            Logger.resultBase("Black Triggered");
+            getRoundStatistic().incrementColorTriggered(ChipColor.BLACK);
             playerScore.addClaudronDropBonus();
         }
     }
 
-    private void executeInstantEffect(Chip chip, RoundBagManager roundBagManager) {
+    private int executeInstantEffect(Chip chip, RoundBagManager roundBagManager) {
         if (BLUE.equals(chip.getColor())) {
-            doBlueEffect(chip, roundBagManager);
+            getRoundStatistic().incrementColorTriggered(ChipColor.BLUE);
+            return doBlueEffect(chip, roundBagManager);
         } else if (YELLOW.equals(chip.getColor())) {
-            doYellowEffect(roundBagManager);
+            getRoundStatistic().incrementColorTriggered(ChipColor.YELLOW);
+            return doYellowEffect(roundBagManager);
         }
+        return 0;
     }
 
-    private void doBlueEffect(Chip chip, RoundBagManager chipsInClaudron) {
+    private int doBlueEffect(Chip chip, RoundBagManager chipsInRoundBag) {
         int howManyChipsWillDrawn = chip.getValue();
-        var drawnChips = drawChips(chipsInClaudron, howManyChipsWillDrawn);
-        ChoosenChip choosenChip = decisionMaker.chooseChip(drawnChips);
+        var drawnChips = drawChips(chipsInRoundBag, howManyChipsWillDrawn);
+        ChoosenChip choosenChip = decisionMaker.chooseChipForBlueEffect(drawnChips);
 
         removeChoosenChipFromDrawnChips(choosenChip, drawnChips);
-        throwChipsBackInBag(chipsInClaudron, drawnChips);
+        // Lege die nicht gewählten Chips direkt zurück in undrawnChipsInBag
+        // (nicht über throwChipBackInBag, da diese Chips nie in drawnChips waren)
+        drawnChips.forEach(chipsInRoundBag.getUndrawnChips()::add);
 
         putChipInClaudron(choosenChip);
+        return choosenChip.getChip().getValue();
     }
 
-    private void doYellowEffect(RoundBagManager roundBagManager) {
+    private int doYellowEffect(RoundBagManager roundBagManager) {
         var chipsInClaudron = roundBagManager.getDrawnChips();
+        if (chipsInClaudron.size() < 2) {
+            return 0;
+        }
         var lastChip = chipsInClaudron.get(chipsInClaudron.size() - 2);
         //vorletzte da Gelb bereits hinzugefügt wurde in der runde
         if (ChipColor.WHITE.equals(lastChip.getColor())) {
             roundBagManager.throwChipBackInBag(lastChip);
+            return lastChip.getValue() * -1;
         }
+        return 0;
     }
 
     private static void removeChoosenChipFromDrawnChips(ChoosenChip choosenChip, List<Chip> drawnChips) {

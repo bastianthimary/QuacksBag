@@ -11,9 +11,7 @@ public class ChipsStore {
     public static List<Chip> getAllKindsOfChips() {
         List<Chip> buyable = new ArrayList<>();
         // White (Knallerbsen) - common starter values (1,2,3)
-        buyable.add(new Chip(ChipColor.WHITE, 1));
-        buyable.add(new Chip(ChipColor.WHITE, 2));
-        buyable.add(new Chip(ChipColor.WHITE, 3));
+
 
         // Colored ingredients (typically come in 1/2/4 variants in many books)
         buyable.add(new Chip(ChipColor.ORANGE, 1));

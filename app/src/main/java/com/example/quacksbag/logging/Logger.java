@@ -18,6 +18,10 @@ public class Logger {
         currentLevel = level;
     }
 
+    public static boolean isLevelEnabled(Level level) {
+        return level.ordinal() <= currentLevel.ordinal();
+    }
+
     public static void log(Level level, String message) {
         if (level.ordinal() <= currentLevel.ordinal()) {
             System.out.println("[" + level.name() + "] " + message);

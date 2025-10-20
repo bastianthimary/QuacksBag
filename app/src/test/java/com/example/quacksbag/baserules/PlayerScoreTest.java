@@ -1,10 +1,14 @@
 package com.example.quacksbag.baserules;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.example.quacksbag.gamematerial.ClaudronPlayersData;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerScoreTest {
 
@@ -120,12 +124,6 @@ class PlayerScoreTest {
         assertEquals(30, playerScore.getVictoryPoints());
     }
 
-    @Test
-    void testSetVictoryPoints() {
-        playerScore.setVictoryPoints(50);
-        
-        assertEquals(50, playerScore.getVictoryPoints());
-    }
 
     @Test
     void testAddNegativeVictoryPoints() {

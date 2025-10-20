@@ -1,5 +1,7 @@
 package com.example.quacksbag.baserules;
 
+import static com.example.quacksbag.statistic.RoundStatistic.getRoundStatistic;
+
 import com.example.quacksbag.gamematerial.Chip;
 import com.example.quacksbag.gamematerial.ChipColor;
 import com.example.quacksbag.gamematerial.ClaudronPlayersData;
@@ -24,7 +26,7 @@ public class RoundClaudron {
         this.ruleset = ruleset;
         this.roundBagManager = roundBagManager;
         this.decisionMaker = decisionMaker;
-        this.exploded=false;
+        this.exploded = false;
     }
 
     public List<Chip> getChipsInClaudron() {
@@ -55,14 +57,14 @@ public class RoundClaudron {
         int value;
         if (ChipColor.WHITE.equals(chip.getColor())) {
             determineExplosion(chip);
-            if (checkFlaskOption(chip)){
+            if (checkFlaskOption(chip)) {
                 return;
             }
             roundBagManager.putChipInClaudron(chip);
             value = chip.getValue();
 
         } else {
-            value = ruleset.determineValueExecuteInsantEffectAndPutInClaudron(chip, roundBagManager,decisionMaker,this);
+            value = ruleset.determineValueExecuteInsantEffectAndPutInClaudron(chip, roundBagManager, decisionMaker, this);
         }
         currentPosition = currentPosition + value;
     }
@@ -71,6 +73,7 @@ public class RoundClaudron {
         firecrackerPeaCounter = firecrackerPeaCounter + chip.getValue();
         if (firecrackerPeaCounter >= 7) {
             exploded = true;
+            getRoundStatistic().explode();
         }
     }
 

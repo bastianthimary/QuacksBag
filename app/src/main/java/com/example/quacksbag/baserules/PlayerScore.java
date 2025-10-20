@@ -1,5 +1,7 @@
 package com.example.quacksbag.baserules;
 
+import static com.example.quacksbag.statistic.GameStatistic.getGameStatistic;
+
 import com.example.quacksbag.gamematerial.ClaudronPlayersData;
 
 public class PlayerScore {
@@ -42,11 +44,9 @@ public class PlayerScore {
         return victoryPoints;
     }
 
-    public void setVictoryPoints(int victoryPoints) {
-        this.victoryPoints = victoryPoints;
-    }
 
     public void addRuby() {
+        getGameStatistic().addRuby();
         rubyCount++;
     }
 
