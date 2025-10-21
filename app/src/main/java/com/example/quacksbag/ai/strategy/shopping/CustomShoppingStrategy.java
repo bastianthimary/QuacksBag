@@ -10,7 +10,6 @@ import com.example.quacksbag.max.strategy.buy.StrategyCalculator;
 import com.example.quacksbag.ruleset.ChipPrice;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,13 +30,18 @@ public class CustomShoppingStrategy implements ShoppingStrategy {
         StrategyCalculator strategyCalculator = new StrategyCalculator(filteredChipsByStrategy, comboResultWeight);
         Map<Integer, BuyStrategy> strategiesForBudgets = strategyCalculator.calculateStrategiesForBudgets(bubbleValue);
         BuyStrategy buyStrategy = strategiesForBudgets.get(bubbleValue);
-        return determineShoppingDecision(buyStrategy);
+        return determineShoppingDecision(buyStrategy, bubbleValue);
     }
 
-    private List<Chip> determineShoppingDecision(BuyStrategy buyStrategy) {
+    private List<Chip> determineShoppingDecision(BuyStrategy buyStrategy, int bubbleValue) {
         List<Chip> shoppingDecision = new ArrayList<>();
         if (buyStrategy == null) {
-            shoppingDecision.add(new Chip(ChipColor.ORANGE, 1));
+            if (bubbleValue > 3 && bubbleValue < 6) {
+                shoppingDecision.add(new Chip(ChipColor.ORANGE, 1));
+            } else {
+                shoppingDecision.add(new Chip(ChipColor.ORANGE, 1));
+                shoppingDecision.add(new Chip(ChipColor.ORANGE, 1));
+            }
             return shoppingDecision;
         }
         shoppingDecision.add(buyStrategy.getFirstChip());

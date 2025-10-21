@@ -39,7 +39,7 @@ class RoundClaudronTest {
     @Test
     void constructor_initializesCorrectly() {
         roundBagManager = new RoundBagManager(Collections.EMPTY_LIST);
-        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS,false), mockRuleset, roundBagManager,new testDecisionMaker());
+        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS, false), mockRuleset, roundBagManager, new testDecisionMaker());
         assertEquals(DROP_BONUS, roundClaudron.getCurrentPosition());
         assertFalse(roundClaudron.isExploded());
         // Verify mocks were set (optional, as they are used in other tests)
@@ -49,7 +49,7 @@ class RoundClaudronTest {
     @Test
     void isExploded_initialIsFalse() {
         roundBagManager = new RoundBagManager(Collections.emptyList());
-        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS,false), mockRuleset, roundBagManager,new testDecisionMaker());
+        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS, false), mockRuleset, roundBagManager, new testDecisionMaker());
         assertFalse(roundClaudron.isExploded());
     }
 
@@ -59,7 +59,7 @@ class RoundClaudronTest {
         int chipValueFromRuleset = 2; // As per user requirement: ruleset returns chip's value
         List<Chip> expectedChips = List.of(blueChip);
         roundBagManager = new RoundBagManager(expectedChips);
-        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS,false), mockRuleset, roundBagManager,new testDecisionMaker());
+        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS, false), mockRuleset, roundBagManager, new testDecisionMaker());
         roundClaudron.putChipInClaudron(blueChip);
 
         assertEquals(DROP_BONUS + chipValueFromRuleset, roundClaudron.getCurrentPosition());
@@ -72,7 +72,7 @@ class RoundClaudronTest {
         Chip whiteChip2 = new Chip(ChipColor.WHITE, 1);
         List<Chip> expectedChips = Arrays.asList(whiteChip1, whiteChip2);
         roundBagManager = new RoundBagManager(expectedChips);
-        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS,false), mockRuleset, roundBagManager,new testDecisionMaker());
+        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS, false), mockRuleset, roundBagManager, new testDecisionMaker());
         roundClaudron.putChipInClaudron(whiteChip1);
 
         assertEquals(DROP_BONUS + whiteChip1.getValue(), roundClaudron.getCurrentPosition());
@@ -91,7 +91,7 @@ class RoundClaudronTest {
         Chip whiteChip4 = new Chip(ChipColor.WHITE, 4);
         List<Chip> expectedChips = Arrays.asList(whiteChip3, whiteChip4);
         roundBagManager = new RoundBagManager(expectedChips);
-        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS,false), mockRuleset, roundBagManager,new testDecisionMaker());
+        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS, false), mockRuleset, roundBagManager, new testDecisionMaker());
         roundClaudron.putChipInClaudron(whiteChip3); // Counter = 3
         assertEquals(DROP_BONUS + 3, roundClaudron.getCurrentPosition());
         assertEquals(3, roundClaudron.getFirecrackerPeaCounter());
@@ -109,7 +109,7 @@ class RoundClaudronTest {
         Chip whiteChip2 = new Chip(ChipColor.WHITE, 3);
         Chip whiteChip3 = new Chip(ChipColor.WHITE, 1);
         roundBagManager = new RoundBagManager(Collections.emptyList());
-        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS,false), mockRuleset, roundBagManager,new testDecisionMaker());
+        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS, false), mockRuleset, roundBagManager, new testDecisionMaker());
         roundClaudron.putChipInClaudron(whiteChip1); // counter = 4
         roundClaudron.putChipInClaudron(whiteChip2); // counter = 4+3 = 7, exploded
         assertTrue(roundClaudron.isExploded());
@@ -129,7 +129,7 @@ class RoundClaudronTest {
 
         List<Chip> expectedChips = Arrays.asList(blueChip, whiteChip);
         roundBagManager = new RoundBagManager(expectedChips);
-        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS,false), mockRuleset, roundBagManager,new testDecisionMaker());
+        roundClaudron = new RoundClaudron(new ClaudronPlayersData(DROP_BONUS, false), mockRuleset, roundBagManager, new testDecisionMaker());
         roundClaudron.putChipInClaudron(whiteChip); // firecracker = 2, position = 0 + 2 = 2
         assertEquals(2, roundClaudron.getFirecrackerPeaCounter());
         assertFalse(roundClaudron.isExploded());
@@ -170,6 +170,7 @@ class RoundClaudronTest {
         }
 
     }
+
     private static class testDecisionMaker implements DecisionMaker {
 
         @Override
@@ -210,5 +211,13 @@ class RoundClaudronTest {
         System.out.println("Bubble Value: " + bubble.getBubbleValue());
         System.out.println("Victory Points: " + bubble.getVictoryPoints());
         System.out.println("Robin: " + bubble.isRuby());
+    }
+
+    @Test
+    void testClaudronCreationLastBubble() {
+        Claudron claudron = new Claudron();
+        var bubble = claudron.getBubbleForPosition(53);
+        assertEquals(35, bubble.getBubbleValue());
+        assertEquals(15, bubble.getVictoryPoints());
     }
 }

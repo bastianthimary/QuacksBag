@@ -122,7 +122,9 @@ public class RoundFinishManager {
         do {
             if (playerScore.getRubyCount() >= 2) {
                 rubyBuyAble = decisionMaker.buyDropOrFlask();
-                excecuteRubyBuyAble(rubyBuyAble);
+                if (!excecuteRubyBuyAble(rubyBuyAble)) {
+                    rubyBuyAble = RubyBuyables.NONE;
+                }
             } else {
                 rubyBuyAble = RubyBuyables.NONE;
             }
@@ -130,14 +132,18 @@ public class RoundFinishManager {
         Logger.debug("BuyDropOrFlask finished");
     }
 
-    private void excecuteRubyBuyAble(RubyBuyables rubyBuyAble) {
+    private boolean excecuteRubyBuyAble(RubyBuyables rubyBuyAble) {
         if (RubyBuyables.DROP.equals(rubyBuyAble)) {
             playerScore.payRuby();
             playerScore.addClaudronDropBonus();
+            return true;
         } else if (RubyBuyables.FLASK.equals(rubyBuyAble)) {
             if (playerScore.fillFlask()) {
                 playerScore.payRuby();
+                return true;
             }
+            return false;
         }
+        return false;
     }
 }

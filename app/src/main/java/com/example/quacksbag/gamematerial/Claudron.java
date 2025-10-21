@@ -70,6 +70,9 @@ public class Claudron {
     }
 
     public Bubble getBubbleForPosition(int pos){
+        if (pos >= bubbles.size()) {
+            return bubbles.get(53);
+        }
        return bubbles.get(pos);
     }
 

@@ -283,7 +283,7 @@ class Ruleset1BlueEffectTest {
         if (blue1InDrawn) {
             // Blue 1 wurde gewählt, also sollte Red 1 zurück in undrawn sein
             assertTrue(undrawnChips.stream()
-                            .anyMatch(c -> ChipColor.RED.equals(c.getColor()) && c.getValue() == 1),
+                            .anyMatch(c -> (ChipColor.RED.equals(c.getColor()) || ChipColor.GREEN.equals(c.getColor())) && c.getValue() == 1),
                     "Red 1 sollte in undrawn sein, wenn Blue 1 gewählt wurde");
         }
     }

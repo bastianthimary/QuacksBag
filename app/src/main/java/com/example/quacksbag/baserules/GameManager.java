@@ -37,6 +37,9 @@ public class GameManager {
                 Chip chip = BagDrawer.drawRandomChipAndUpdateBag(roundClaudron.getRoundBagManager());
                 roundClaudron.putChipInClaudron(chip);
                 drawChoice = decisionMaker.doAnotherDraw();
+                if (reachedEndOfClaudron()) {
+                    drawChoice = DrawChoice.END_ROUND;
+                }
             }
             Logger.info("Go to Finish Round: " + currentRound);
             RoundFinishManager roundFinishManager = new RoundFinishManager(roundClaudron, ruleset, playerScore, decisionMaker, currentRound);
@@ -44,9 +47,13 @@ public class GameManager {
             roundFinishManager.excecuteRoundFinish();
             doStatistics();
         }
-        var victoryPoints=playerScore.getVictoryPoints();
+        var victoryPoints = playerScore.getVictoryPoints();
         Logger.result("Game finished with " + victoryPoints + " victory points");
         return victoryPoints;
+    }
+
+    private boolean reachedEndOfClaudron() {
+        return roundClaudron.getCurrentPosition() <= 53;
     }
 
     private void doStatistics() {
