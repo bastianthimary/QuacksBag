@@ -1,5 +1,7 @@
 package com.example.quacksbag.ai; // Angenommenes Paket
 
+import androidx.annotation.NonNull;
+
 import com.example.quacksbag.ai.strategy.draw.DrawStrategy;
 import com.example.quacksbag.ai.strategy.explosion.ExplosionStrategy;
 import com.example.quacksbag.ai.strategy.flask.FlaskStrategy;
@@ -73,14 +75,52 @@ public class AiDecisionMakerRuleSet1 extends Rulset1DecisionMaker {
                 if (choosenChip == null) {
                     choosenChip = new ChoosenChip(chip);
                 } else {
-                    if (choosenChip.getChip().getValue() < chip.getValue()) {
-                        choosenChip = new ChoosenChip(chip);
-                    }
+                    choosenChip = determineBestChip(chip, choosenChip);
                 }
             }
         }
 
-
         return choosenChip;
+    }
+
+    @NonNull
+    private ChoosenChip determineBestChip(Chip chip, ChoosenChip choosenChip) {
+        int currentPriority = getColorPriority(choosenChip.getChip().getColor());
+        int newPriority = getColorPriority(chip.getColor());
+        if (newPriority < 9) {
+            if (newPriority < currentPriority) {
+                // Höhere Priorität (niedrigere Zahl)
+                choosenChip = new ChoosenChip(chip);
+            } else if (newPriority == currentPriority) {
+                // Gleiche Priorität: nach Wert sortieren
+                if (choosenChip.getChip().getValue() < chip.getValue()) {
+                    choosenChip = new ChoosenChip(chip);
+                }
+            }
+        }
+        return choosenChip;
+    }
+
+    private int getColorPriority(ChipColor color) {
+        boolean hasOrangeInBag = gameManager.getRoundClaudron().getRoundBagManager()
+                .getDrawnChips().stream()
+                .anyMatch(chip -> ChipColor.ORANGE.equals(chip.getColor()));
+
+        switch (color) {
+            case PURPLE:
+                return 1;
+            case BLACK:
+                return 2;
+            case BLUE:
+                return 3;
+            case ORANGE:
+                return hasOrangeInBag ? 4 : 6;
+            case RED:
+                return hasOrangeInBag ? 5 : 7;
+            case GREEN:
+                return 8;
+            default:
+                return 9;
+        }
     }
 }

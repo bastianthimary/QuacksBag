@@ -99,7 +99,9 @@ public class Ruleset1 implements Ruleset {
         // Lege die nicht gewählten Chips direkt zurück in undrawnChipsInBag
         // (nicht über throwChipBackInBag, da diese Chips nie in drawnChips waren)
         drawnChips.forEach(chipsInRoundBag.getUndrawnChips()::add);
-
+        if (choosenChip == null || choosenChip.getChip() == null) {
+            return 0;
+        }
         putChipInClaudron(choosenChip);
         return choosenChip.getChip().getValue();
     }
@@ -125,8 +127,10 @@ public class Ruleset1 implements Ruleset {
     }
 
     private void putChipInClaudron(ChoosenChip choosenChip) {
-        if (choosenChip != null) {
-            roundClaudron.putChipInClaudron(choosenChip.getChip());
+        if (choosenChip != null && choosenChip.getChip() != null) {
+            // Chip direkt in den Claudron legen, OHNE weitere Effektverarbeitung
+            // um Rekursion zu vermeiden (der Chip wurde bereits durch doBlueEffect gezogen)
+            roundClaudron.getRoundBagManager().putChipInClaudron(choosenChip.getChip());
         }
     }
 
@@ -136,7 +140,9 @@ public class Ruleset1 implements Ruleset {
 
     private List<Chip> drawChips(RoundBagManager chipsInClaudron, int howManyChipsWillDrawn) {
         return IntStream.range(0, howManyChipsWillDrawn)
-                .mapToObj(i -> BagDrawer.drawRandomChipAndUpdateBag(chipsInClaudron)).collect(Collectors.toList());
+                .mapToObj(i -> BagDrawer.drawRandomChipAndUpdateBag(chipsInClaudron))
+                .filter(chip -> chip != null)  // Null-Chips filtern (z.B. wenn Bag leer ist)
+                .collect(Collectors.toList());
     }
 
     private int determineValue(Chip chip, RoundBagManager chipsInClaudron) {

@@ -150,17 +150,17 @@ class RoundClaudronTest {
 
         @Override
         public void executePurpleRoundEndEffect(RoundBagManager chipsInClaudron, PlayerScore playerScore) {
-
+            //Empty implementation
         }
 
         @Override
         public void executeGreenRoundEndEffect(RoundBagManager chipsInClaudron, PlayerScore playerScore) {
-
+            //Empty implementation
         }
 
         @Override
         public void executeBlackRoundEndEffect(RoundBagManager chipsInClaudron, PlayerScore playerScore) {
-
+            //Empty implementation
         }
 
 
@@ -200,7 +200,7 @@ class RoundClaudronTest {
 
         @Override
         public void setGameManager(GameManager gameManager) {
-
+//Empty implementation
         }
     }
 
@@ -217,6 +217,14 @@ class RoundClaudronTest {
     void testClaudronCreationLastBubble() {
         Claudron claudron = new Claudron();
         var bubble = claudron.getBubbleForPosition(53);
+        assertEquals(35, bubble.getBubbleValue());
+        assertEquals(15, bubble.getVictoryPoints());
+    }
+
+    @Test
+    void testClaudronCreationLastBubbleWithTooHighPosition() {
+        Claudron claudron = new Claudron();
+        var bubble = claudron.getBubbleForPosition(70);
         assertEquals(35, bubble.getBubbleValue());
         assertEquals(15, bubble.getVictoryPoints());
     }

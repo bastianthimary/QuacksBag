@@ -5,6 +5,7 @@ import static com.example.quacksbag.statistic.GameStatistic.getGameStatistic;
 import com.example.quacksbag.gamematerial.Bubble;
 import com.example.quacksbag.gamematerial.Chip;
 import com.example.quacksbag.gamematerial.Claudron;
+import com.example.quacksbag.gamematerial.ClaudronUtil;
 import com.example.quacksbag.logging.Logger;
 import com.example.quacksbag.player.DecisionMaker;
 import com.example.quacksbag.player.ExplosionChoice;
@@ -27,7 +28,7 @@ public class RoundFinishManager {
         this.roundClaudron = roundClaudron;
         this.ruleset = ruleset;
         this.playerScore = playerScore;
-        this.decisionMaker = decisionMaker; // DecisionMaker initialisieren
+        this.decisionMaker = decisionMaker;
         claudron = new Claudron();
         this.currentRound = currentRound;
     }
@@ -88,8 +89,7 @@ public class RoundFinishManager {
     }
 
     private boolean isRubyField() {
-        var bubble = claudron.getBubbleForPosition(roundClaudron.getCurrentPosition());
-        return bubble.isRuby();
+        return ClaudronUtil.isPositionARubyBubble(roundClaudron.getCurrentPosition());
     }
 
     private void executeShoppingOrTakeVictoryPoints(ExplosionChoice choice) {

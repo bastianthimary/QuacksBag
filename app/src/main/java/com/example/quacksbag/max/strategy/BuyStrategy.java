@@ -25,4 +25,12 @@ public class BuyStrategy {
     public Chip getSecondChip() {
         return secondChip;
     }
+
+    public int getChipNumber() {
+        return secondChip != null ? 2 : 1;
+    }
+
+    public void setSecondChip(Chip secondChip) {
+        this.secondChip = secondChip;
+    }
 }

@@ -41,5 +41,15 @@ public class PriceRuleset1 extends PriceRuleset {
         };
     }
 
+    @Override
+    protected int determinePurpleByValue(int chipValue) {
+        return 9;
+    }
+
+    @Override
+    protected int determineBlackByValue(int chipValue) {
+        return 10;
+    }
+
 
 }

@@ -53,7 +53,7 @@ public class GameManager {
     }
 
     private boolean reachedEndOfClaudron() {
-        return roundClaudron.getCurrentPosition() <= 53;
+        return roundClaudron.getCurrentPosition() >= 53;
     }
 
     private void doStatistics() {

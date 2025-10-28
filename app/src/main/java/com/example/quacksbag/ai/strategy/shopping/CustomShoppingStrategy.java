@@ -15,17 +15,17 @@ import java.util.Map;
 
 public class CustomShoppingStrategy implements ShoppingStrategy {
     private final ComboResultWeight comboResultWeight;
-    private final DetermineBuyableChipsByStrategy determineBuyableChipsByStrategy;
+    private final BuyableChipFilter buyableChipFilter;
 
     public CustomShoppingStrategy(ComboResultWeight comboResultWeight, List<WishedChip> wantedChips) {
         this.comboResultWeight = comboResultWeight;
-        this.determineBuyableChipsByStrategy = new DetermineBuyableChipsByStrategy(wantedChips);
+        this.buyableChipFilter = new BuyableChipFilter(wantedChips);
     }
 
     @Override
     public List<Chip> decideShopping(GameManager gameManager, int bubbleValue, List<ChipPrice> buyableChips) {
         Logger.result("DecideShopping Round: " + gameManager.getCurrentRound() + " BubbleValue: " + bubbleValue + "");
-        List<ChipPrice> filteredChipsByStrategy = determineBuyableChipsByStrategy.filterBuyableChips(gameManager, buyableChips);
+        List<ChipPrice> filteredChipsByStrategy = buyableChipFilter.filterBuyableChipsByColorAndWitchStillNeeded(gameManager, buyableChips);
 
         StrategyCalculator strategyCalculator = new StrategyCalculator(filteredChipsByStrategy, comboResultWeight);
         Map<Integer, BuyStrategy> strategiesForBudgets = strategyCalculator.calculateStrategiesForBudgets(bubbleValue);
@@ -36,7 +36,7 @@ public class CustomShoppingStrategy implements ShoppingStrategy {
     private List<Chip> determineShoppingDecision(BuyStrategy buyStrategy, int bubbleValue) {
         List<Chip> shoppingDecision = new ArrayList<>();
         if (buyStrategy == null) {
-            if (bubbleValue > 3 && bubbleValue < 6) {
+            if (bubbleValue >= 3 && bubbleValue < 6) {
                 shoppingDecision.add(new Chip(ChipColor.ORANGE, 1));
             } else {
                 shoppingDecision.add(new Chip(ChipColor.ORANGE, 1));

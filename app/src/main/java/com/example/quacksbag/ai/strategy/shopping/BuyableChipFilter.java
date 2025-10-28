@@ -11,15 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DetermineBuyableChipsByStrategy {
+public class BuyableChipFilter {
 
-    private final List<WishedChip> wantedChips;
+    private final List<WishedChip> wishedChips;
 
-    public DetermineBuyableChipsByStrategy(List<WishedChip> wantedChips) {
-        this.wantedChips = wantedChips;
+    public BuyableChipFilter(List<WishedChip> wishedChips) {
+        this.wishedChips = wishedChips;
     }
 
-    public List<ChipPrice> filterBuyableChips(GameManager gameManager, List<ChipPrice> buyableChips) {
+    public List<ChipPrice> filterBuyableChipsByColorAndWitchStillNeeded(GameManager gameManager, List<ChipPrice> buyableChips) {
         var chipsInBag = new ArrayList<>(gameManager.getPlayerScore().getBagManager().getPurchasedChips());
         chipsInBag.addAll(BagUtil.defaultStartingChips());
         List<ChipColor> stillNeededColors = determineStillNeededColors(chipsInBag);
@@ -29,7 +29,7 @@ public class DetermineBuyableChipsByStrategy {
 
     protected List<ChipColor> determineStillNeededColors(List<Chip> chipsInBag) {
         List<ChipColor> stillNeededColors = new ArrayList<>();
-        wantedChips.forEach(wantedChip -> addStillNeededColors(chipsInBag, wantedChip, stillNeededColors));
+        wishedChips.forEach(wantedChip -> addStillNeededColors(chipsInBag, wantedChip, stillNeededColors));
         return stillNeededColors;
     }
 
@@ -51,7 +51,7 @@ public class DetermineBuyableChipsByStrategy {
         return UndrawnChipsUtil.findChipsByColor(chipsInBag, wantedChip.getChipColor()).size();
     }
 
-    protected List<ChipPrice> filterBuyableChipsByNeededColors(List<ChipPrice> buyableChips, List<ChipColor> stillNeededColors) {
+    public List<ChipPrice> filterBuyableChipsByNeededColors(List<ChipPrice> buyableChips, List<ChipColor> stillNeededColors) {
         return buyableChips.stream().filter(chipPrice -> stillNeededColors.contains(chipPrice.getChip().getColor())).collect(Collectors.toList());
     }
 

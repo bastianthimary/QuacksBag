@@ -8,8 +8,7 @@ public enum ChipColor {
     RED("Red"),
     YELLOW("Yellow"),
     PURPLE("Purple"),
-    BLACK("Black")
-    ;
+    BLACK("Black");
 
     ChipColor(String colorname) {
         this.colorname = colorname;

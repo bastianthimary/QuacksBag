@@ -55,6 +55,9 @@ public class GameStatistic {
         rubyCount.incrementAndGet();
     }
 
+    public AtomicInteger getRubyCount() {
+        return rubyCount;
+    }
     public HashMap<Chip, AtomicInteger> getChipCount() {
         return chipCount;
     }
