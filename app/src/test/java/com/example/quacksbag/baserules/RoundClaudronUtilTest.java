@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-class RoundClaudronTest {
+class RoundClaudronUtilTest {
 
     private RoundClaudron roundClaudron;
 

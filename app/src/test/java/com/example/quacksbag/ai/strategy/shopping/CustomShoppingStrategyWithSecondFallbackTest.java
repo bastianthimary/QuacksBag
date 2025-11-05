@@ -93,27 +93,6 @@ class CustomShoppingStrategyWithSecondFallbackTest {
     }
 
     @Test
-    void testFilterBuyable() {
-        // Arrange
-        WishedChip primaryWish = new WishedChip(ChipColor.YELLOW);
-        WishedChip fallbackWish = new WishedChip(ChipColor.ORANGE);
-        strategy = new CustomShoppingStrategyWithSecondFallback(
-                primaryWish, fallbackWish, null
-        );
-        ChipPriceDeterminer chipPriceDeterminer = new ChipPriceDeterminer(new PriceRuleset1());
-        List<ChipPrice> chipPrices = chipPriceDeterminer.determinePrices();
-        PlayerScore playerScore = new PlayerScore("Player1");
-        when(mockGameManager.getPlayerScore()).thenReturn(playerScore);
-
-        // Act
-        strategy.decideShopping(mockGameManager, 0, chipPrices);
-
-        // Assert
-        assertEquals(3, strategy.getPrimaryPrices().size());
-        assertEquals(1, strategy.getFallbackPrices().size());
-    }
-
-    @Test
     void testDecideShoppingValue3() {
         List<ChipPrice> chipPrices = setupForDecideShoppingtests();
         //Assert

@@ -2,7 +2,6 @@ package com.example.quacksbag.ai.strategy.shopping;
 
 import com.example.quacksbag.baserules.GameManager;
 import com.example.quacksbag.gamematerial.Chip;
-import com.example.quacksbag.gamematerial.ChipColor;
 import com.example.quacksbag.logging.Logger;
 import com.example.quacksbag.max.strategy.BuyStrategy;
 import com.example.quacksbag.max.strategy.buy.ComboResultWeight;
@@ -13,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class CustomShoppingStrategy implements ShoppingStrategy {
+public class CustomShoppingStrategy extends ShoppingStrategy {
     private final ComboResultWeight comboResultWeight;
     private final BuyableChipFilter buyableChipFilter;
 
@@ -24,7 +23,7 @@ public class CustomShoppingStrategy implements ShoppingStrategy {
 
     @Override
     public List<Chip> decideShopping(GameManager gameManager, int bubbleValue, List<ChipPrice> buyableChips) {
-        Logger.result("DecideShopping Round: " + gameManager.getCurrentRound() + " BubbleValue: " + bubbleValue + "");
+        Logger.result("DecideShopping Round: " + gameManager.getCurrentRound() + " BubbleValue: " + bubbleValue);
         List<ChipPrice> filteredChipsByStrategy = buyableChipFilter.filterBuyableChipsByColorAndWitchStillNeeded(gameManager, buyableChips);
 
         StrategyCalculator strategyCalculator = new StrategyCalculator(filteredChipsByStrategy, comboResultWeight);
@@ -35,14 +34,9 @@ public class CustomShoppingStrategy implements ShoppingStrategy {
 
     private List<Chip> determineShoppingDecision(BuyStrategy buyStrategy, int bubbleValue) {
         List<Chip> shoppingDecision = new ArrayList<>();
-        if (buyStrategy == null) {
-            if (bubbleValue >= 3 && bubbleValue < 6) {
-                shoppingDecision.add(new Chip(ChipColor.ORANGE, 1));
-            } else {
-                shoppingDecision.add(new Chip(ChipColor.ORANGE, 1));
-                shoppingDecision.add(new Chip(ChipColor.ORANGE, 1));
-            }
-            return shoppingDecision;
+        List<Chip> shoppingDecision1 = orangeFallBackIfBuyStrategyIsStillNull(buyStrategy, bubbleValue, shoppingDecision);
+        if (shoppingDecision1 != null) {
+            return shoppingDecision1;
         }
         shoppingDecision.add(buyStrategy.getFirstChip());
         if (buyStrategy.getSecondChip() != null) {

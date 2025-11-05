@@ -68,59 +68,54 @@ public class AiDecisionMakerRuleSet1 extends Rulset1DecisionMaker {
     }
 
     @Override
-    public ChoosenChip chooseChipForBlueEffect(List<Chip> chips) {
+    public ChoosenChip chooseChipForBlueEffect(List<Chip> drawnChips) {
         ChoosenChip choosenChip = null;
-        for (Chip chip : chips) {
-            if (!ChipColor.WHITE.equals(chip.getColor())) {
+        for (Chip drawnChip : drawnChips) {
+            if (!ChipColor.WHITE.equals(drawnChip.getColor())) {
                 if (choosenChip == null) {
-                    choosenChip = new ChoosenChip(chip);
+                    choosenChip = new ChoosenChip(drawnChip);
                 } else {
-                    choosenChip = determineBestChip(chip, choosenChip);
+                    choosenChip = determineBestChip(choosenChip, drawnChip);
                 }
             }
         }
-
         return choosenChip;
     }
 
     @NonNull
-    private ChoosenChip determineBestChip(Chip chip, ChoosenChip choosenChip) {
-        int currentPriority = getColorPriority(choosenChip.getChip().getColor());
-        int newPriority = getColorPriority(chip.getColor());
-        if (newPriority < 9) {
-            if (newPriority < currentPriority) {
+    protected ChoosenChip determineBestChip(ChoosenChip choosenChip, Chip drawnChip) {
+        int currentChoosenPriority = determineColorPriority(choosenChip.getChip().getColor());
+        int drawnChipPriority = determineColorPriority(drawnChip.getColor());
+        if (hasAChoosablePriority(drawnChipPriority)) {
+            if (drawnChipPriority < currentChoosenPriority) {
                 // Höhere Priorität (niedrigere Zahl)
-                choosenChip = new ChoosenChip(chip);
-            } else if (newPriority == currentPriority) {
-                // Gleiche Priorität: nach Wert sortieren
-                if (choosenChip.getChip().getValue() < chip.getValue()) {
-                    choosenChip = new ChoosenChip(chip);
+                choosenChip = new ChoosenChip(drawnChip);
+            } else if (drawnChipPriority == currentChoosenPriority) {
+                if (choosenChip.getChip().getValue() < drawnChip.getValue()) {
+                    choosenChip = new ChoosenChip(drawnChip);
                 }
             }
         }
         return choosenChip;
     }
 
-    private int getColorPriority(ChipColor color) {
+    protected static boolean hasAChoosablePriority(int drawnChipPriority) {
+        return drawnChipPriority < 9;
+    }
+
+    protected int determineColorPriority(ChipColor color) {
         boolean hasOrangeInBag = gameManager.getRoundClaudron().getRoundBagManager()
                 .getDrawnChips().stream()
                 .anyMatch(chip -> ChipColor.ORANGE.equals(chip.getColor()));
 
-        switch (color) {
-            case PURPLE:
-                return 1;
-            case BLACK:
-                return 2;
-            case BLUE:
-                return 3;
-            case ORANGE:
-                return hasOrangeInBag ? 4 : 6;
-            case RED:
-                return hasOrangeInBag ? 5 : 7;
-            case GREEN:
-                return 8;
-            default:
-                return 9;
-        }
+        return switch (color) {
+            case PURPLE -> 1;
+            case BLACK -> 2;
+            case BLUE -> 3;
+            case ORANGE -> hasOrangeInBag ? 4 : 6;
+            case RED -> hasOrangeInBag ? 5 : 9;
+            case GREEN -> 8;
+            default -> 9;
+        };
     }
 }

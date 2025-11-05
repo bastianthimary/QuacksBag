@@ -4,7 +4,7 @@ import com.example.quacksbag.gamematerial.ChipColor;
 
 public class WishedChip {
     private int numberOfChips=-1;
-    private ChipColor chipColor;
+    private final ChipColor chipColor;
 
     public WishedChip(ChipColor chipColor) {
         this.chipColor = chipColor;
@@ -15,10 +15,7 @@ public class WishedChip {
         this.chipColor = chipColor;
     }
     public boolean isLimited(){
-        if(numberOfChips==-1){
-            return false;
-        }
-        return true;
+        return numberOfChips != -1;
     }
 
     public ChipColor getChipColor() {

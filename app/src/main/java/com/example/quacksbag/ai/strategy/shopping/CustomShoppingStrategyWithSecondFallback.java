@@ -4,7 +4,6 @@ import androidx.annotation.Nullable;
 
 import com.example.quacksbag.baserules.GameManager;
 import com.example.quacksbag.gamematerial.Chip;
-import com.example.quacksbag.gamematerial.ChipColor;
 import com.example.quacksbag.max.strategy.BuyStrategy;
 import com.example.quacksbag.max.strategy.buy.ComboResultWeight;
 import com.example.quacksbag.max.strategy.buy.StrategyCalculator;
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class CustomShoppingStrategyWithSecondFallback implements ShoppingStrategy {
+public class CustomShoppingStrategyWithSecondFallback extends ShoppingStrategy {
 
     private final WishedChip primaryWish;
     private final WishedChip fallbackWish;
@@ -24,7 +23,7 @@ public class CustomShoppingStrategyWithSecondFallback implements ShoppingStrateg
     private List<ChipPrice> primaryPrices;
     private List<ChipPrice> fallbackPrices;
     private List<ChipPrice> secondFallbackPrices;
-
+    private BuyStrategy buyStrategy;
 
     public CustomShoppingStrategyWithSecondFallback(WishedChip primaryWish, WishedChip fallbackWish, WishedChip secondFallbackWish) {
         this.primaryWish = primaryWish;
@@ -35,53 +34,32 @@ public class CustomShoppingStrategyWithSecondFallback implements ShoppingStrateg
     @Override
     public List<Chip> decideShopping(GameManager gameManager, int bubbleValue, List<ChipPrice> buyableChips) {
 
-        primaryPrices = new BuyableChipFilter(createListFromWish(primaryWish))
+        setupPrices(gameManager, buyableChips);
+        StrategyCalculator strategyCalculator = new StrategyCalculator(primaryPrices, ComboResultWeight.MAX_SCORE);
+        Map<Integer, BuyStrategy> strategiesForBudgets = strategyCalculator.calculateStrategiesForBudgets(bubbleValue);
+        buyStrategy = strategiesForBudgets.get(bubbleValue);
+
+        return determineShoppingDecision(bubbleValue);
+    }
+
+    private void setupPrices(GameManager gameManager, List<ChipPrice> buyableChips) {
+        primaryPrices = new BuyableChipFilter(List.of(primaryWish))
                 .filterBuyableChipsByColorAndWitchStillNeeded(gameManager, buyableChips);
         if (hasFallbackWish()) {
-            fallbackPrices = new BuyableChipFilter(createListFromWish(fallbackWish)).filterBuyableChipsByColorAndWitchStillNeeded(gameManager, buyableChips);
+            fallbackPrices = new BuyableChipFilter(List.of(fallbackWish)).filterBuyableChipsByColorAndWitchStillNeeded(gameManager, buyableChips);
         }
         if (hasSecondFallbackWish()) {
-            secondFallbackPrices = new BuyableChipFilter(createListFromWish(secondFallbackWish)).filterBuyableChipsByColorAndWitchStillNeeded(gameManager, buyableChips);
+            secondFallbackPrices = new BuyableChipFilter(List.of(secondFallbackWish)).filterBuyableChipsByColorAndWitchStillNeeded(gameManager, buyableChips);
         }
-        StrategyCalculator strategyCalculator = new StrategyCalculator(primaryPrices, ComboResultWeight.MAX_SCORE);
-
-        Map<Integer, BuyStrategy> strategiesForBudgets = strategyCalculator.calculateStrategiesForBudgets(bubbleValue);
-        BuyStrategy buyStrategy = strategiesForBudgets.get(bubbleValue);
-
-        return determineShoppingDecision(buyStrategy, bubbleValue);
     }
 
-    private List<WishedChip> createListFromWish(WishedChip wish) {
-        List<WishedChip> list = new ArrayList<>();
-        list.add(wish);
-        return list;
-    }
-
-    private List<Chip> determineShoppingDecision(BuyStrategy buyStrategy, int bubbleValue) {
+    private List<Chip> determineShoppingDecision(int bubbleValue) {
 
         List<Chip> shoppingDecision = new ArrayList<>();
-        if (buyStrategy == null) {
-            // Try fallback
-            if (hasFallbackWish()) {
-                StrategyCalculator strategyCalculator = new StrategyCalculator(fallbackPrices, ComboResultWeight.ALLWAYS2CHIPS_MAXSCORE);
-                Map<Integer, BuyStrategy> strategiesForBudgets = strategyCalculator.calculateStrategiesForBudgets(bubbleValue);
-                buyStrategy = strategiesForBudgets.get(bubbleValue);
-            }
-
-            // Try second fallback if fallback also failed
-            if (buyStrategy == null && hasSecondFallbackWish()) {
-                StrategyCalculator strategyCalculator = new StrategyCalculator(secondFallbackPrices, ComboResultWeight.ALLWAYS2CHIPS_MAXSCORE);
-                Map<Integer, BuyStrategy> strategiesForBudgets = strategyCalculator.calculateStrategiesForBudgets(bubbleValue);
-                buyStrategy = strategiesForBudgets.get(bubbleValue);
-            }
-
-            // If still null, use orange fallback
-            List<Chip> shoppingDecision1 = orangeFallBackIfBuyStrategyIsStillNull(buyStrategy, bubbleValue, shoppingDecision);
-            if (shoppingDecision1 != null) return shoppingDecision1;
-        } else if (buyStrategy.getChipNumber() == 1) {
-            addSecondChipIfCanAffort(buyStrategy, bubbleValue);
+        shoppingDecision = fillBuyStrategyIfNotFull(bubbleValue, shoppingDecision);
+        if (!shoppingDecision.isEmpty()) {
+            return shoppingDecision;
         }
-
         shoppingDecision.add(buyStrategy.getFirstChip());
         if (buyStrategy.getSecondChip() != null) {
             shoppingDecision.add(buyStrategy.getSecondChip());
@@ -89,19 +67,40 @@ public class CustomShoppingStrategyWithSecondFallback implements ShoppingStrateg
         return shoppingDecision;
     }
 
-    @Nullable
-    private static List<Chip> orangeFallBackIfBuyStrategyIsStillNull(BuyStrategy buyStrategy, int bubbleValue, List<Chip> shoppingDecision) {
+
+    private List<Chip> fillBuyStrategyIfNotFull(int bubbleValue, List<Chip> shoppingDecision) {
         if (buyStrategy == null) {
-            if (bubbleValue >= 3 && bubbleValue < 6) {
-                shoppingDecision.add(new Chip(ChipColor.ORANGE, 1));
-            } else if (bubbleValue >= 6) {
-                shoppingDecision.add(new Chip(ChipColor.ORANGE, 1));
-                shoppingDecision.add(new Chip(ChipColor.ORANGE, 1));
+            buyStrategy = fillBuyStrategyWithFallBack(bubbleValue);
+            shoppingDecision = orangeFallBackIfBuyStrategyIsStillNull(buyStrategy, bubbleValue, shoppingDecision);
+            if (shoppingDecision != null) {
+                return shoppingDecision;
             }
-            return shoppingDecision;
+        } else if (buyStrategy.getChipNumber() == 1) {
+            addSecondChipIfCanAffort(buyStrategy, bubbleValue);
         }
-        return null;
+        return shoppingDecision;
     }
+
+    @Nullable
+    private BuyStrategy fillBuyStrategyWithFallBack(int bubbleValue) {
+        if (hasFallbackWish()) {
+            buyStrategy = determineBuyStrategyForPrices(fallbackPrices, bubbleValue);
+        }
+        if (buyStrategy == null && hasSecondFallbackWish()) {
+            buyStrategy = determineBuyStrategyForPrices(secondFallbackPrices, bubbleValue);
+        }
+        return buyStrategy;
+    }
+
+    @Nullable
+    private BuyStrategy determineBuyStrategyForPrices(List<ChipPrice> secondFallbackPrices, int bubbleValue) {
+        BuyStrategy buyStrategy;
+        StrategyCalculator strategyCalculator = new StrategyCalculator(secondFallbackPrices, ComboResultWeight.ALLWAYS2CHIPS_MAXSCORE);
+        Map<Integer, BuyStrategy> strategiesForBudgets = strategyCalculator.calculateStrategiesForBudgets(bubbleValue);
+        buyStrategy = strategiesForBudgets.get(bubbleValue);
+        return buyStrategy;
+    }
+
 
     private void addSecondChipIfCanAffort(BuyStrategy buyStrategy, int bubbleValue) {
         PriceRuleset priceRuleset = new PriceRuleset1();
@@ -123,8 +122,8 @@ public class CustomShoppingStrategyWithSecondFallback implements ShoppingStrateg
             while (leftBudget >= checkPriceForPosition(prices, i)) {
                 valuestChipForBudget = prices.get(i).getChip();
                 i++;
-
             }
+
             if (valuestChipForBudget != null) {
                 buyStrategy.setSecondChip(valuestChipForBudget);
             }

@@ -26,7 +26,6 @@ public class BuyableChipFilter {
         return filterBuyableChipsByNeededColors(buyableChips, stillNeededColors);
     }
 
-
     protected List<ChipColor> determineStillNeededColors(List<Chip> chipsInBag) {
         List<ChipColor> stillNeededColors = new ArrayList<>();
         wishedChips.forEach(wantedChip -> addStillNeededColors(chipsInBag, wantedChip, stillNeededColors));

@@ -1,8 +1,9 @@
 package com.example.quacksbag.ai.strategy.draw;
 
 import com.example.quacksbag.baserules.GameManager;
-import com.example.quacksbag.gamematerial.ChipColor;
 import com.example.quacksbag.player.DrawChoice;
+import com.example.quacksbag.util.RoundBagManagerUtil;
+import com.example.quacksbag.util.RoundClaudronUtil;
 
 public class CustomDrawStrategyByProbability extends DrawStrategy {
     private final double probabilityInZeroDot;
@@ -16,7 +17,7 @@ public class CustomDrawStrategyByProbability extends DrawStrategy {
         if (!canClaudronExplodeNextDraw(gameManager)) {
             return DrawChoice.DRAW_NEXT;
         }
-        if (isTheProbabilityToExplodeHigherThanMyLimit(gameManager)){
+        if (isTheProbabilityToExplodeHigherThanMyLimit(gameManager)) {
             return DrawChoice.END_ROUND;
         }
         return DrawChoice.DRAW_NEXT;
@@ -26,13 +27,10 @@ public class CustomDrawStrategyByProbability extends DrawStrategy {
         var roundClaudron = gameManager.getRoundClaudron();
         var fireCrackerCounter = roundClaudron.getFirecrackerPeaCounter();
         var limitForExplosion = 7 - fireCrackerCounter;
-        var numberOfWhiteChipsWhichCanExplode = roundClaudron.getRoundBagManager()
-                .getUndrawnChips().stream()
-                .filter(chip -> chip.getColor().equals(ChipColor.WHITE) && chip.getValue() >= limitForExplosion)
-                .count();
+        var numberOfWhiteChipsWhichCanExplode = new RoundClaudronUtil(roundClaudron).findNumberOfWhiteChipValueOverLimit(limitForExplosion);
 
-        var numberofChipsinClaudron = roundClaudron.getRoundBagManager().getUndrawnChips().size();
-        double probabilityToExplode = (double) numberOfWhiteChipsWhichCanExplode / numberofChipsinClaudron;
-        return probabilityToExplode> probabilityInZeroDot;
+        var numberOfChipsInClaudron = new RoundBagManagerUtil(roundClaudron.getRoundBagManager()).getNumberOfChipsInClaudron();
+        double probabilityToExplode = (double) numberOfWhiteChipsWhichCanExplode / numberOfChipsInClaudron;
+        return probabilityToExplode > probabilityInZeroDot;
     }
 }
